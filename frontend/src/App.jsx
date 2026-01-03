@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import Budgets from './pages/Budgets';
 import Analytics from './pages/Analytics';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
               <Route path="expenses" element={<Expenses />} />
               <Route path="budgets" element={<Budgets />} />
               <Route path="analytics" element={<Analytics />} />
-              <Route path="profile" element={<div className="p-8 text-center">Profile page coming soon...</div>} />
+              <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
           <Toaster position="top-right" />
