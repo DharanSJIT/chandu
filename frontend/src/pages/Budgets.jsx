@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, AlertTriangle, CheckCircle, XCircle, Calendar, TrendingUp, DollarSign } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../services/authService';
 
@@ -77,167 +77,334 @@ const Budgets = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'safe': return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'warning': return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-      case 'critical': return <AlertTriangle className="w-5 h-5 text-orange-500" />;
-      case 'exceeded': return <XCircle className="w-5 h-5 text-red-500" />;
+      case 'safe': return <CheckCircle className="w-5 h-5 text-emerald-600" />;
+      case 'warning': return <AlertTriangle className="w-5 h-5 text-amber-600" />;
+      case 'critical': return <AlertTriangle className="w-5 h-5 text-orange-600" />;
+      case 'exceeded': return <XCircle className="w-5 h-5 text-rose-600" />;
       default: return null;
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'safe': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
+      case 'safe': return 'bg-emerald-500';
+      case 'warning': return 'bg-amber-500';
       case 'critical': return 'bg-orange-500';
-      case 'exceeded': return 'bg-red-500';
-      default: return 'bg-gray-300';
+      case 'exceeded': return 'bg-rose-500';
+      default: return 'bg-slate-300';
     }
   };
 
+  const getStatusBadge = (status) => {
+    const badges = {
+      safe: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      warning: 'bg-amber-50 text-amber-700 border-amber-200',
+      critical: 'bg-orange-50 text-orange-700 border-orange-200',
+      exceeded: 'bg-rose-50 text-rose-700 border-rose-200'
+    };
+    return badges[status] || 'bg-slate-50 text-slate-700 border-slate-200';
+  };
+
+  const getCategoryIcon = (category) => {
+    const icons = {
+      Food: '🍽️',
+      Travel: '✈️',
+      Rent: '🏠',
+      Entertainment: '🎬',
+      Healthcare: '⚕️',
+      Shopping: '🛍️',
+      Utilities: '💡',
+      Other: '📦'
+    };
+    return icons[category] || '📦';
+  };
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Budget Management
-        </h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-primary text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-primary/90"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Budget</span>
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow animate-pulse h-48"></div>
-          ))}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                Budget Management
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400">
+                Track and manage your spending across different categories
+              </p>
+            </div>
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-blue-600 text-white px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-blue-700 transition-colors shadow-sm font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Add Budget</span>
+            </button>
+          </div>
         </div>
-      ) : budgets.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">No budgets created yet</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {budgets.map((budget) => (
-            <div key={budget._id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {budget.category}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
-                    {budget.period} Budget
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  {getStatusIcon(budget.status)}
-                  <button
-                    onClick={() => {
-                      setEditingBudget(budget);
-                      setFormData({
-                        category: budget.category,
-                        amount: budget.amount,
-                        period: budget.period,
-                        startDate: new Date(budget.startDate).toISOString().split('T')[0],
-                        endDate: new Date(budget.endDate).toISOString().split('T')[0]
-                      });
-                      setShowModal(true);
-                    }}
-                    className="text-primary hover:text-primary/90"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(budget._id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
 
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Spent: ₹{budget.spent?.toFixed(2) || '0.00'}</span>
-                  <span>Budget: ₹{budget.amount.toFixed(2)}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${getStatusColor(budget.status)}`}
-                    style={{ width: `${Math.min(budget.percentage || 0, 100)}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs mt-1 text-gray-500">
-                  <span>{budget.percentage || 0}% used</span>
-                  <span>₹{budget.remaining?.toFixed(2) || '0.00'} left</span>
-                </div>
+        {/* Budget Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium mb-1">Total Budgets</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{budgets.length}</p>
               </div>
-
-              <div className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date(budget.startDate).toLocaleDateString()} - {new Date(budget.endDate).toLocaleDateString()}
+              <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-          ))}
+          </div>
+          
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium mb-1">Total Allocated</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  ₹{budgets.reduce((sum, b) => sum + b.amount, 0).toFixed(0)}
+                </p>
+              </div>
+              <div className="bg-emerald-100 dark:bg-emerald-900/30 p-3 rounded-lg">
+                <DollarSign className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium mb-1">Total Spent</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  ₹{budgets.reduce((sum, b) => sum + (b.spent || 0), 0).toFixed(0)}
+                </p>
+              </div>
+              <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
+                <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* Budget Cards */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 animate-pulse h-64"></div>
+            ))}
+          </div>
+        ) : budgets.length === 0 ? (
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-12 text-center">
+            <div className="w-20 h-20 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <DollarSign className="w-10 h-10 text-slate-400" />
+            </div>
+            <p className="text-slate-900 dark:text-white font-semibold text-lg mb-2">No budgets created yet</p>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">Start by creating your first budget to track your expenses</p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-blue-600 text-white px-6 py-3 rounded-xl inline-flex items-center space-x-2 hover:bg-blue-700 transition-colors font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Create Budget</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {budgets.map((budget) => (
+              <div key={budget._id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border-2 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all overflow-hidden">
+                {/* Card Header */}
+                <div className="bg-slate-50 dark:bg-slate-750 px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-3xl">{getCategoryIcon(budget.category)}</div>
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                          {budget.category}
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 capitalize flex items-center space-x-1">
+                          <span>{budget.period}</span>
+                          <span>•</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(budget.status)}`}>
+                            {budget.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <button
+                        onClick={() => {
+                          setEditingBudget(budget);
+                          setFormData({
+                            category: budget.category,
+                            amount: budget.amount,
+                            period: budget.period,
+                            startDate: new Date(budget.startDate).toISOString().split('T')[0],
+                            endDate: new Date(budget.endDate).toISOString().split('T')[0]
+                          });
+                          setShowModal(true);
+                        }}
+                        className="p-2 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(budget._id)}
+                        className="p-2 text-slate-600 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                <div className="p-6">
+                  {/* Amount Display */}
+                  <div className="mb-5">
+                    <div className="flex justify-between items-baseline mb-3">
+                      <div>
+                        <p className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide mb-1">Spent</p>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-white">₹{budget.spent?.toFixed(2) || '0.00'}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide mb-1">Budget</p>
+                        <p className="text-xl font-semibold text-slate-700 dark:text-slate-300">₹{budget.amount.toFixed(2)}</p>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="relative">
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                        <div
+                          className={`h-3 rounded-full transition-all duration-500 ${getStatusColor(budget.status)}`}
+                          style={{ width: `${Math.min(budget.percentage || 0, 100)}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <div className="flex items-center space-x-2">
+                          {getStatusIcon(budget.status)}
+                          <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                            {budget.percentage || 0}% used
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                          ₹{budget.remaining?.toFixed(2) || '0.00'} left
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Date Range */}
+                  <div className="bg-slate-50 dark:bg-slate-750 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center justify-center space-x-2 text-xs text-slate-600 dark:text-slate-400">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span className="font-medium">
+                        {new Date(budget.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                      <span>→</span>
+                      <span className="font-medium">
+                        {new Date(budget.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              {editingBudget ? 'Edit Budget' : 'Create New Budget'}
-            </h2>
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                >
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Budget Amount"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  required
-                />
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={formData.period}
-                  onChange={(e) => setFormData({...formData, period: e.target.value})}
-                >
-                  <option value="monthly">Monthly</option>
-                  <option value="weekly">Weekly</option>
-                </select>
-                <div className="grid grid-cols-2 gap-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-700">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {editingBudget ? 'Edit Budget' : 'Create New Budget'}
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                {editingBudget ? 'Update your budget details' : 'Set up a new budget to track your expenses'}
+              </p>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Category
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-750 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 dark:text-white transition-all"
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{getCategoryIcon(cat)} {cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Budget Amount (₹)
+                  </label>
                   <input
-                    type="date"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                    required
-                  />
-                  <input
-                    type="date"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                    type="number"
+                    step="0.01"
+                    placeholder="Enter amount"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-750 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 dark:text-white placeholder-slate-400 transition-all"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
                     required
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Period
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-750 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 dark:text-white transition-all"
+                    value={formData.period}
+                    onChange={(e) => setFormData({...formData, period: e.target.value})}
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-750 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 dark:text-white transition-all"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-750 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 dark:text-white transition-all"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-end space-x-3 mt-6">
+
+              {/* Modal Footer */}
+              <div className="flex justify-end space-x-3 mt-8">
                 <button
                   type="button"
                   onClick={() => {
@@ -245,18 +412,21 @@ const Budgets = () => {
                     setEditingBudget(null);
                     resetForm();
                   }}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-6 py-3 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium shadow-sm"
                 >
-                  {editingBudget ? 'Update' : 'Create'}
+                  {editingBudget ? 'Update Budget' : 'Create Budget'}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
