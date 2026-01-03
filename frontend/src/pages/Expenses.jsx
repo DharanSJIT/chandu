@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { expenseService } from '../services/authService';
-import { Plus, Edit, Trash2, Search, Filter, Calendar, Tag, DollarSign, FileText, MoreVertical, Eye, Camera } from 'lucide-react';
+import { aiService } from '../services/aiService';
+import { Plus, Edit, Trash2, Search, Filter, Calendar, Tag, DollarSign, FileText, MoreVertical, Eye, Camera, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OCRUpload from '../components/OCRUpload';
 
@@ -25,6 +26,7 @@ const Expenses = () => {
     date: new Date().toISOString().split('T')[0],
     notes: ''
   });
+  const [generatingNote, setGeneratingNote] = useState(false);
 
   const categories = [
     { name: 'Food', icon: '🍽️', color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/20' },
@@ -53,6 +55,24 @@ const Expenses = () => {
       toast.error('Error fetching expenses');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateAINote = async () => {
+    if (!formData.title || !formData.amount || !formData.category) {
+      toast.error('Please fill title, amount, and category first');
+      return;
+    }
+    
+    setGeneratingNote(true);
+    try {
+      const response = await aiService.generateNote(formData.title, formData.amount, formData.category);
+      setFormData({...formData, notes: response.data.note});
+      toast.success('AI note generated!');
+    } catch (error) {
+      toast.error('Failed to generate note');
+    } finally {
+      setGeneratingNote(false);
     }
   };
 
@@ -433,9 +453,20 @@ const Expenses = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Notes (Optional)
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Notes (Optional)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={generateAINote}
+                      disabled={generatingNote || !formData.title || !formData.amount}
+                      className="flex items-center space-x-1 text-xs text-primary hover:text-primary/80 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>{generatingNote ? 'Generating...' : 'AI Generate'}</span>
+                    </button>
+                  </div>
                   <textarea
                     placeholder="Add any notes about this expense"
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"

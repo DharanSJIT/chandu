@@ -146,6 +146,21 @@ class GeminiService {
       return { prediction: 0, confidence: 0 };
     }
   }
+
+  async generateExpenseNote(title, amount, category) {
+    try {
+      if (!this.model) return '';
+
+      const prompt = `Generate a brief, helpful note for this expense: "${title}" - ₹${amount} in ${category} category. Return only the note text, max 50 words.`;
+      
+      const result = await this.model.generateContent(prompt);
+      const note = (await result.response.text()).trim();
+      
+      return note || `${category} expense of ₹${amount}`;
+    } catch (error) {
+      return `${category} expense of ₹${amount}`;
+    }
+  }
 }
 
 module.exports = new GeminiService();
