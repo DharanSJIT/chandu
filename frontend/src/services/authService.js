@@ -35,4 +35,13 @@ export const budgetService = {
   deleteBudget: (id) => api.delete(`/budgets/${id}`),
 };
 
+export const ocrService = {
+  extractFromImage: (formData) => api.post('/ocr/extract', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  createExpenseFromImage: (formData) => api.post('/ocr/create-expense', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+};
+
 export default api;

@@ -3,6 +3,7 @@ import { expenseService } from '../services/authService';
 import { DollarSign, TrendingUp, Calendar, Tag, Plus, ArrowUpRight, ArrowDownRight, Clock, Target, AlertTriangle } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Link } from 'react-router-dom';
+import AIInsights from '../components/AIInsights.jsx';
 
 const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -331,54 +332,7 @@ const Dashboard = () => {
           </div>
 
           {/* Insights */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Smart Insights
-            </h3>
-            <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                      Predicted Next Month
-                    </p>
-                    <p className="text-lg font-bold text-blue-600">
-                      ₹{insights.predictedNextMonth?.toFixed(2) || '0.00'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              {spendingTrend !== 0 && (
-                <div className={`p-4 rounded-lg ${
-                  spendingTrend > 0 
-                    ? 'bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20' 
-                    : 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'
-                }`}>
-                  <div className="flex items-start space-x-3">
-                    <AlertTriangle className={`w-5 h-5 mt-0.5 ${
-                      spendingTrend > 0 ? 'text-red-600' : 'text-green-600'
-                    }`} />
-                    <div>
-                      <p className={`text-sm font-medium ${
-                        spendingTrend > 0 
-                          ? 'text-red-900 dark:text-red-100' 
-                          : 'text-green-900 dark:text-green-100'
-                      }`}>
-                        Spending Trend
-                      </p>
-                      <p className={`text-lg font-bold ${
-                        spendingTrend > 0 ? 'text-red-600' : 'text-green-600'
-                      }`}>
-                        {spendingTrend > 0 ? '+' : ''}{spendingTrend}%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <AIInsights />
         </div>
       </div>
     </div>

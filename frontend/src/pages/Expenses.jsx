@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { expenseService } from '../services/authService';
-import { Plus, Edit, Trash2, Search, Filter, Calendar, Tag, DollarSign, FileText, MoreVertical, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Filter, Calendar, Tag, DollarSign, FileText, MoreVertical, Eye, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import OCRUpload from '../components/OCRUpload';
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showOCRModal, setShowOCRModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -114,6 +116,17 @@ const Expenses = () => {
     });
   };
 
+  const handleOCRExpense = (extractedData) => {
+    setFormData({
+      title: extractedData.title,
+      amount: extractedData.amount.toString(),
+      category: extractedData.category,
+      date: extractedData.date,
+      notes: extractedData.merchant ? `Merchant: ${extractedData.merchant}` : 'Auto-extracted from image'
+    });
+    setShowModal(true);
+  };
+
   const clearFilters = () => {
     setFilters({
       search: '',
@@ -148,6 +161,13 @@ const Expenses = () => {
           >
             <Filter className="w-4 h-4" />
             <span>Filters</span>
+          </button>
+          <button
+            onClick={() => setShowOCRModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 hover:bg-green-700 transition-colors"
+          >
+            <Camera className="w-4 h-4" />
+            <span>Scan Receipt</span>
           </button>
           <button
             onClick={() => setShowModal(true)}
@@ -447,6 +467,13 @@ const Expenses = () => {
             </form>
           </div>
         </div>
+      )}
+      {/* OCR Modal */}
+      {showOCRModal && (
+        <OCRUpload
+          onExpenseExtracted={handleOCRExpense}
+          onClose={() => setShowOCRModal(false)}
+        />
       )}
     </div>
   );
