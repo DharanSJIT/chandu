@@ -127,7 +127,7 @@ const LandingPage = () => {
       {/* Auth Modal */}
       {showAuthModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl" style={{backgroundImage: 'url(/landing_bg.png)', backgroundSize: 'cover', backgroundPosition: 'center'}}>
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900">
                 {isLogin ? 'Welcome Back' : 'Create Account'}
