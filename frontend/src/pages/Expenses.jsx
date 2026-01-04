@@ -187,71 +187,68 @@ const Expenses = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Expenses
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Expense Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Track and manage your expenses
+            Track and organize your financial transactions
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`px-4 py-2 rounded-xl flex items-center space-x-2 transition-colors ${
+            className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
               showFilters 
-                ? 'bg-primary text-white' 
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800' 
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'
             }`}
           >
-            <Filter className="w-4 h-4" />
-            <span>Filters</span>
+            <Filter className="w-4 h-4 mr-1 inline" />
+            Filters
           </button>
           <button
             onClick={() => setShowSmartSearch(true)}
-            className="bg-purple-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 hover:bg-purple-700 transition-colors"
+            className="px-3 py-2 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
           >
-            <Sparkles className="w-4 h-4" />
-            <span>Smart Search</span>
+            <Sparkles className="w-4 h-4 mr-1 inline" />
+            Smart Search
           </button>
           <button
             onClick={() => setShowVoiceModal(true)}
-            className="bg-purple-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 hover:bg-purple-700 transition-colors"
+            className="px-3 py-2 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
           >
-            <Mic className="w-4 h-4" />
-            <span>Voice Entry</span>
+            <Mic className="w-4 h-4 mr-1 inline" />
+            Voice
           </button>
           <button
             onClick={() => setShowOCRModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 hover:bg-green-700 transition-colors"
+            className="px-3 py-2 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
           >
-            <Camera className="w-4 h-4" />
-            <span>Scan Receipt</span>
+            <Camera className="w-4 h-4 mr-1 inline" />
+            Scan
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-primary text-white px-6 py-2 rounded-xl flex items-center space-x-2 hover:bg-primary/90 transition-colors shadow-lg"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white border border-blue-600 hover:bg-blue-700 transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add Expense</span>
+            <Plus className="w-4 h-4 mr-1 inline" />
+            Add Expense
           </button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-xl">
-              <DollarSign className="w-6 h-6 text-blue-600" />
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 {filters.category ? `${filters.category} Total` : 'Total Amount'}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ₹{totalAmount.toFixed(2)}
+              <p className="text-xl font-semibold text-gray-900 dark:text-white">
+                ₹{totalAmount.toLocaleString()}
               </p>
               {filters.category && (
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
@@ -259,36 +256,39 @@ const Expenses = () => {
                 </p>
               )}
             </div>
+            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-blue-600" />
+            </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-xl">
-              <FileText className="w-6 h-6 text-green-600" />
-            </div>
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 {filters.category ? `${filters.category} Count` : 'Total Expenses'}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{expenses.length}</p>
+              <p className="text-xl font-semibold text-gray-900 dark:text-white">{expenses.length}</p>
               {filters.category && (
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                   {filters.category} expenses
                 </p>
               )}
             </div>
+            <div className="w-10 h-10 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5 text-green-600" />
+            </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-xl">
-              <Tag className="w-6 h-6 text-purple-600" />
-            </div>
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Average Amount</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ₹{expenses.length > 0 ? (totalAmount / expenses.length).toFixed(2) : '0.00'}
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Average Amount</p>
+              <p className="text-xl font-semibold text-gray-900 dark:text-white">
+                ₹{expenses.length > 0 ? (totalAmount / expenses.length).toLocaleString() : '0'}
               </p>
+            </div>
+            <div className="w-10 h-10 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
+              <Tag className="w-5 h-5 text-purple-600" />
             </div>
           </div>
         </div>
@@ -296,31 +296,31 @@ const Expenses = () => {
 
       {/* Filters */}
       {showFilters && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filters</h3>
+            <h3 className="text-base font-medium text-gray-900 dark:text-white">Filter Options</h3>
             <button
               onClick={clearFilters}
-              className="text-sm text-primary hover:text-primary/80 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
               Clear All
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
               <input
                 type="text"
                 name="search"
                 placeholder="Search expenses..."
-                className="w-full pl-10 pr-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={filters.search}
                 onChange={handleFilterChange}
               />
             </div>
             <select
               name="category"
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -332,14 +332,14 @@ const Expenses = () => {
             <input
               type="date"
               name="startDate"
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={filters.startDate}
               onChange={handleFilterChange}
             />
             <input
               type="date"
               name="endDate"
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={filters.endDate}
               onChange={handleFilterChange}
             />
