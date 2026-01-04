@@ -202,6 +202,53 @@ Rules:
       return null;
     }
   }
+
+  async parseNaturalLanguageQuery(query) {
+    try {
+      if (!this.model) return null;
+
+      const prompt = `Parse this natural language expense query into search filters: "${query}"
+Return ONLY valid JSON:
+{
+  "category": "Food",
+  "startDate": "2024-01-01",
+  "endDate": "2024-01-31",
+  "minAmount": 100,
+  "maxAmount": 1000,
+  "search": "keyword",
+  "sortBy": "date",
+  "sortOrder": "desc"
+}
+
+Rules:
+- category: Food, Travel, Rent, Entertainment, Healthcare, Shopping, Utilities, Other (or null)
+- dates in YYYY-MM-DD format (or null)
+- amounts as numbers (or null)
+- search for keywords in title/notes (or null)
+- sortBy: date, amount, category (default: date)
+- sortOrder: asc, desc (default: desc)
+- Only include fields that are mentioned in the query`;
+      
+      const result = await this.model.generateContent(prompt);
+      const text = await result.response.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      
+      if (jsonMatch) {
+        const filters = JSON.parse(jsonMatch[0]);
+        // Clean up null values
+        Object.keys(filters).forEach(key => {
+          if (filters[key] === null || filters[key] === 'null') {
+            delete filters[key];
+          }
+        });
+        return filters;
+      }
+      return {};
+    } catch (error) {
+      console.error('Natural language parsing error:', error);
+      return {};
+    }
+  }
 }
 
 module.exports = new GeminiService();

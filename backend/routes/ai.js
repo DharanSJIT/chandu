@@ -28,4 +28,14 @@ router.post('/parse-voice', auth, async (req, res) => {
   }
 });
 
+router.post('/parse-query', auth, async (req, res) => {
+  try {
+    const { query } = req.body;
+    const filters = await geminiService.parseNaturalLanguageQuery(query);
+    res.json({ filters });
+  } catch (error) {
+    res.status(500).json({ message: 'Error parsing natural language query' });
+  }
+});
+
 module.exports = router;

@@ -5,6 +5,7 @@ import { Plus, Edit, Trash2, Search, Filter, Calendar, Tag, DollarSign, FileText
 import toast from 'react-hot-toast';
 import OCRUpload from '../components/OCRUpload';
 import VoiceInput from '../components/VoiceInput';
+import SmartSearch from '../components/SmartSearch';
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -12,6 +13,7 @@ const Expenses = () => {
   const [showModal, setShowModal] = useState(false);
   const [showOCRModal, setShowOCRModal] = useState(false);
   const [showVoiceModal, setShowVoiceModal] = useState(false);
+  const [showSmartSearch, setShowSmartSearch] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -160,6 +162,13 @@ const Expenses = () => {
     setShowModal(true);
   };
 
+  const handleSmartSearch = (parsedFilters) => {
+    setFilters({
+      ...filters,
+      ...parsedFilters
+    });
+  };
+
   const clearFilters = () => {
     setFilters({
       search: '',
@@ -170,6 +179,10 @@ const Expenses = () => {
   };
 
   const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const filteredTotal = expenses.length > 0 ? totalAmount : 0;
+  const categoryTotal = filters.category ? 
+    `${filters.category} Total: ₹${totalAmount.toFixed(2)}` : 
+    `Total Amount: ₹${totalAmount.toFixed(2)}`;
 
   return (
     <div className="space-y-6">
@@ -194,6 +207,13 @@ const Expenses = () => {
           >
             <Filter className="w-4 h-4" />
             <span>Filters</span>
+          </button>
+          <button
+            onClick={() => setShowSmartSearch(true)}
+            className="bg-purple-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 hover:bg-purple-700 transition-colors"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Smart Search</span>
           </button>
           <button
             onClick={() => setShowVoiceModal(true)}
@@ -227,8 +247,17 @@ const Expenses = () => {
               <DollarSign className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Amount</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">₹{totalAmount.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {filters.category ? `${filters.category} Total` : 'Total Amount'}
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ₹{totalAmount.toFixed(2)}
+              </p>
+              {filters.category && (
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                  Filtered by {filters.category}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -238,8 +267,15 @@ const Expenses = () => {
               <FileText className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {filters.category ? `${filters.category} Count` : 'Total Expenses'}
+              </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{expenses.length}</p>
+              {filters.category && (
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                  {filters.category} expenses
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -532,6 +568,17 @@ const Expenses = () => {
         <VoiceInput
           onExpenseParsed={handleVoiceExpense}
           onClose={() => setShowVoiceModal(false)}
+        />
+      )}
+      
+      {/* Smart Search Modal */}
+      {showSmartSearch && (
+        <SmartSearch
+          onFiltersApplied={(filters) => {
+            setFilters({...filters, ...filters});
+            setShowSmartSearch(false);
+          }}
+          onClose={() => setShowSmartSearch(false)}
         />
       )}
     </div>
