@@ -161,6 +161,47 @@ class GeminiService {
       return `${category} expense of ₹${amount}`;
     }
   }
+
+  async parseVoiceExpense(voiceText) {
+    try {
+      if (!this.model) return null;
+
+      const prompt = `Parse this voice input into expense data: "${voiceText}"
+Return ONLY valid JSON:
+{
+  "title": "expense description",
+  "amount": 100,
+  "category": "Food",
+  "date": "2024-01-03",
+  "confidence": 0.8
+}
+
+Rules:
+- Extract amount as number
+- Category: Food, Travel, Rent, Entertainment, Healthcare, Shopping, Utilities, Other
+- Use today's date if not specified
+- confidence 0.1-1.0 based on clarity`;
+      
+      const result = await this.model.generateContent(prompt);
+      const text = await result.response.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      
+      if (jsonMatch) {
+        const data = JSON.parse(jsonMatch[0]);
+        return {
+          title: data.title || 'Voice Expense',
+          amount: Number(data.amount) || 0,
+          category: data.category || 'Other',
+          date: data.date || new Date().toISOString().split('T')[0],
+          confidence: Number(data.confidence) || 0.5
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Voice parsing error:', error);
+      return null;
+    }
+  }
 }
 
 module.exports = new GeminiService();

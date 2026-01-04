@@ -18,4 +18,14 @@ router.post('/generate-note', auth, async (req, res) => {
   }
 });
 
+router.post('/parse-voice', auth, async (req, res) => {
+  try {
+    const { voiceText } = req.body;
+    const expenseData = await geminiService.parseVoiceExpense(voiceText);
+    res.json({ expenseData });
+  } catch (error) {
+    res.status(500).json({ message: 'Error parsing voice input' });
+  }
+});
+
 module.exports = router;

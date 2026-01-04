@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { expenseService } from '../services/authService';
 import { aiService } from '../services/aiService';
-import { Plus, Edit, Trash2, Search, Filter, Calendar, Tag, DollarSign, FileText, MoreVertical, Eye, Camera, Sparkles } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Filter, Calendar, Tag, DollarSign, FileText, MoreVertical, Eye, Camera, Sparkles, Mic } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OCRUpload from '../components/OCRUpload';
+import VoiceInput from '../components/VoiceInput';
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showOCRModal, setShowOCRModal] = useState(false);
+  const [showVoiceModal, setShowVoiceModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -147,6 +149,17 @@ const Expenses = () => {
     setShowModal(true);
   };
 
+  const handleVoiceExpense = (voiceData) => {
+    setFormData({
+      title: voiceData.title,
+      amount: voiceData.amount.toString(),
+      category: voiceData.category,
+      date: voiceData.date,
+      notes: `Voice entry (${Math.round(voiceData.confidence * 100)}% confidence)`
+    });
+    setShowModal(true);
+  };
+
   const clearFilters = () => {
     setFilters({
       search: '',
@@ -181,6 +194,13 @@ const Expenses = () => {
           >
             <Filter className="w-4 h-4" />
             <span>Filters</span>
+          </button>
+          <button
+            onClick={() => setShowVoiceModal(true)}
+            className="bg-purple-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 hover:bg-purple-700 transition-colors"
+          >
+            <Mic className="w-4 h-4" />
+            <span>Voice Entry</span>
           </button>
           <button
             onClick={() => setShowOCRModal(true)}
@@ -504,6 +524,14 @@ const Expenses = () => {
         <OCRUpload
           onExpenseExtracted={handleOCRExpense}
           onClose={() => setShowOCRModal(false)}
+        />
+      )}
+      
+      {/* Voice Input Modal */}
+      {showVoiceModal && (
+        <VoiceInput
+          onExpenseParsed={handleVoiceExpense}
+          onClose={() => setShowVoiceModal(false)}
         />
       )}
     </div>
