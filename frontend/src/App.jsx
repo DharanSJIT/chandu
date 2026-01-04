@@ -3,8 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './layouts/Layout';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import Budgets from './pages/Budgets';
@@ -12,25 +11,49 @@ import Analytics from './pages/Analytics';
 import Profile from './pages/Profile';
 
 function App() {
+  const isAuthenticated = localStorage.getItem('token');
+
   return (
     <AuthProvider>
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/" element={
+            <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />} />
+            <Route path="/dashboard" element={
               <ProtectedRoute>
-                <Layout />
+                <Layout>
+                  <Dashboard />
+                </Layout>
               </ProtectedRoute>
-            }>
-              <Route index element={<Navigate to="/dashboard" />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="expenses" element={<Expenses />} />
-              <Route path="budgets" element={<Budgets />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="profile" element={<Profile />} />
-            </Route>
+            } />
+            <Route path="/expenses" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Expenses />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/budgets" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Budgets />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Analytics />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Profile />
+                </Layout>
+              </ProtectedRoute>
+            } />
           </Routes>
           <Toaster position="top-right" />
         </div>

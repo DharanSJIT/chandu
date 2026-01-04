@@ -1,9 +1,9 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Home, CreditCard, BarChart3, User, LogOut, Moon, Sun, Target } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-const Layout = () => {
+const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const Layout = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const navItems = [
@@ -88,7 +88,7 @@ const Layout = () => {
       </nav>
 
       <main className="w-[83vw] mx-auto py-6 px-4 sm:px-6 lg:px-8 mt-16">
-        <Outlet />
+        {children}
       </main>
     </div>
   );
